@@ -16,8 +16,8 @@ General:
 Data: # ResNet50 | simCLR
     dataset_name: CPTAC_data
     data_shuffle: False
-    data_dir: CPTAC/pt_files/
-    label_dir: dataset_csv/cptac/
+    data_dir: CPTAC/simCLR_pt_files/
+    label_dir: dataset_csv/CPTAC/
     fold: 0
     nfold: 4
 

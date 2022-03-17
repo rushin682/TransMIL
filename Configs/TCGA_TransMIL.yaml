@@ -17,7 +17,7 @@ Data: # simCLR
     dataset_name: TCGA_data
     data_shuffle: False
     data_dir: TCGA/simCLR_pt_files/
-    label_dir: dataset_csv/tcga/
+    label_dir: dataset_csv/TCGA/
     fold: 0
     nfold: 4
 
