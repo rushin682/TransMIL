@@ -47,7 +47,10 @@ class TransMIL(nn.Module):
     def __init__(self, n_classes):
         super(TransMIL, self).__init__()
         self.pos_layer = PPEG(dim=512)
-        self._fc1 = nn.Sequential(nn.Linear(1024, 512), nn.ReLU())
+
+        #----> already on 512 features because of simCLR
+        # self._fc1 = nn.Sequential(nn.Linear(1024, 512), nn.ReLU())
+
         self.cls_token = nn.Parameter(torch.randn(1, 1, 512))
         self.n_classes = n_classes
         self.layer1 = TransLayer(dim=512)
@@ -58,10 +61,10 @@ class TransMIL(nn.Module):
 
     def forward(self, **kwargs):
 
-        h = kwargs['data'].float() #[B, n, 1024]
-        
-        h = self._fc1(h) #[B, n, 512]
-        
+        #----> already on 512 features because of simCLR
+        h = kwargs['data'].float() #[B, n, 512]
+        # h = self._fc1(h) #[B, n, 512]
+
         #---->pad
         H = h.shape[1]
         _H, _W = int(np.ceil(np.sqrt(H))), int(np.ceil(np.sqrt(H)))
@@ -78,7 +81,7 @@ class TransMIL(nn.Module):
 
         #---->PPEG
         h = self.pos_layer(h, _H, _W) #[B, N, 512]
-        
+
         #---->Translayer x2
         h = self.layer2(h) #[B, N, 512]
 
