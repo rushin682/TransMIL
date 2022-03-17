@@ -14,7 +14,7 @@ General:
     log_path: logs/
 
 Data: # ResNet50 | simCLR
-    dataset_name: CPTAC_data
+    dataset_name: cptac_data
     data_shuffle: False
     data_dir: CPTAC/simCLR_pt_files/
     label_dir: dataset_csv/CPTAC/

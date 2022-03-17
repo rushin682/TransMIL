@@ -14,7 +14,7 @@ General:
     log_path: logs/
 
 Data: # simCLR
-    dataset_name: TCGA_data
+    dataset_name: tcga_data
     data_shuffle: False
     data_dir: TCGA/simCLR_pt_files/
     label_dir: dataset_csv/TCGA/
