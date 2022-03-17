@@ -42,7 +42,7 @@ class CptacData(data.Dataset):
     def __getitem__(self, idx):
         slide_id = self.data[idx]
         label = int(self.label[idx])
-        full_path = Path(self.feature_dir) / f'{slide_id}.pt'
+        full_path = Path(self.feature_dir) / slide_id / 'features.pt'
         features = torch.load(full_path)
 
         #----> shuffle
