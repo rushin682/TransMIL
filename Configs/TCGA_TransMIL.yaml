@@ -19,7 +19,7 @@ Data: # simCLR
     data_dir: TCGA/simCLR_pt_files/
     label_dir: dataset_csv/TCGA/
     fold: 0
-    nfold: 4
+    nfold: 1
 
     train_dataloader:
         batch_size: 1

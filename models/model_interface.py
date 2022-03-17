@@ -34,9 +34,9 @@ class  ModelInterface(pl.LightningModule):
 
         #---->acc
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
-        
+
         #---->Metrics
-        if self.n_classes > 2: 
+        if self.n_classes > 2:
             self.AUROC = torchmetrics.AUROC(num_classes = self.n_classes, average = 'macro')
             metrics = torchmetrics.MetricCollection([torchmetrics.Accuracy(num_classes = self.n_classes,
                                                                            average='micro'),
@@ -49,7 +49,7 @@ class  ModelInterface(pl.LightningModule):
                                                                             num_classes = self.n_classes),
                                                      torchmetrics.Specificity(average = 'macro',
                                                                             num_classes = self.n_classes)])
-        else : 
+        else :
             self.AUROC = torchmetrics.AUROC(num_classes=2, average = 'macro')
             metrics = torchmetrics.MetricCollection([torchmetrics.Accuracy(num_classes = 2,
                                                                            average = 'micro'),
@@ -59,6 +59,8 @@ class  ModelInterface(pl.LightningModule):
                                                      torchmetrics.Recall(average = 'macro',
                                                                          num_classes = 2),
                                                      torchmetrics.Precision(average = 'macro',
+                                                                            num_classes = 2),
+                                                     torchmetrics.Specificity(average = 'macro',
                                                                             num_classes = 2)])
         self.valid_metrics = metrics.clone(prefix = 'val_')
         self.test_metrics = metrics.clone(prefix = 'test_')
@@ -92,13 +94,13 @@ class  ModelInterface(pl.LightningModule):
         self.data[Y]["count"] += 1
         self.data[Y]["correct"] += (Y_hat == Y)
 
-        return {'loss': loss} 
+        return {'loss': loss}
 
     def training_epoch_end(self, training_step_outputs):
         for c in range(self.n_classes):
             count = self.data[c]["count"]
             correct = self.data[c]["correct"]
-            if count == 0: 
+            if count == 0:
                 acc = None
             else:
                 acc = float(correct) / count
@@ -126,7 +128,7 @@ class  ModelInterface(pl.LightningModule):
         probs = torch.cat([x['Y_prob'] for x in val_step_outputs], dim = 0)
         max_probs = torch.stack([x['Y_hat'] for x in val_step_outputs])
         target = torch.stack([x['label'] for x in val_step_outputs], dim = 0)
-        
+
         #---->
         self.log('val_loss', cross_entropy_torch(logits, target), prog_bar=True, on_epoch=True, logger=True)
         self.log('auc', self.AUROC(probs, target.squeeze()), prog_bar=True, on_epoch=True, logger=True)
@@ -137,18 +139,18 @@ class  ModelInterface(pl.LightningModule):
         for c in range(self.n_classes):
             count = self.data[c]["count"]
             correct = self.data[c]["correct"]
-            if count == 0: 
+            if count == 0:
                 acc = None
             else:
                 acc = float(correct) / count
             print('class {}: acc {}, correct {}/{}'.format(c, acc, correct, count))
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
-        
+
         #---->random, if shuffle data, change seed
         if self.shuffle == True:
             self.count = self.count+1
             random.seed(self.count*50)
-    
+
 
 
     def configure_optimizers(self):
@@ -173,7 +175,7 @@ class  ModelInterface(pl.LightningModule):
         probs = torch.cat([x['Y_prob'] for x in output_results], dim = 0)
         max_probs = torch.stack([x['Y_hat'] for x in output_results])
         target = torch.stack([x['label'] for x in output_results], dim = 0)
-        
+
         #---->
         auc = self.AUROC(probs, target.squeeze())
         metrics = self.test_metrics(max_probs.squeeze() , target.squeeze())
@@ -186,7 +188,7 @@ class  ModelInterface(pl.LightningModule):
         for c in range(self.n_classes):
             count = self.data[c]["count"]
             correct = self.data[c]["correct"]
-            if count == 0: 
+            if count == 0:
                 acc = None
             else:
                 acc = float(correct) / count

@@ -19,7 +19,7 @@ Data: # ResNet50 | simCLR
     data_dir: CPTAC/simCLR_pt_files/
     label_dir: dataset_csv/CPTAC/
     fold: 0
-    nfold: 4
+    nfold: 5
 
     train_dataloader:
         batch_size: 1
