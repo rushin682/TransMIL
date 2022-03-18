@@ -6,7 +6,7 @@ General:
     precision: 16
     multi_gpu_mode: dp
     gpus: [0]
-    epochs: &epoch 200
+    epochs: &epoch 50
     grad_acc: 2
     frozen_bn: False
     patience: 10
@@ -23,11 +23,11 @@ Data: # simCLR
 
     train_dataloader:
         batch_size: 1
-        num_workers: 8
+        num_workers: 4
 
     test_dataloader:
         batch_size: 1
-        num_workers: 8
+        num_workers: 4
 
 Model:
     name: TransMIL
