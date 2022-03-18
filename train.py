@@ -32,6 +32,7 @@ def main(cfg):
 
     #---->load callbacks
     cfg.callbacks = load_callbacks(cfg)
+    # cfg.callbacks = None
 
     #---->Define Data 
     DataInterface_dict = {'train_batch_size': cfg.Data.train_dataloader.batch_size,
