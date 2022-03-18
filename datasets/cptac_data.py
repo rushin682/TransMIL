@@ -6,6 +6,12 @@ from pathlib import Path
 import torch.utils.data as data
 from torch.utils.data import dataloader
 
+from multiprocessing import set_start_method
+try:
+    set_start_method('spawn')
+except RuntimeError:
+    pass
+
 
 class CptacData(data.Dataset):
     def __init__(self, dataset_cfg=None,
