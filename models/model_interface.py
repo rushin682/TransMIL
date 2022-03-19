@@ -25,13 +25,15 @@ class  ModelInterface(pl.LightningModule):
     #---->init
     def __init__(self, model, loss, optimizer, **kargs):
         super(ModelInterface, self).__init__()
+        print("In ModelInterface before:", self.log_path)
         self.save_hyperparameters()
+        print("In ModelInterface after:", self.log_path)
         self.load_model()
         self.loss = create_loss(loss)
         self.optimizer = optimizer
         self.n_classes = model.n_classes
         self.log_path = kargs['log']
-        print("In ModelInterface:", self.log_path)
+
 
         #---->acc
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
