@@ -23,11 +23,11 @@ Data: # simCLR
 
     train_dataloader:
         batch_size: 1
-        num_workers: 6
+        num_workers: 4
 
     test_dataloader:
         batch_size: 1
-        num_workers: 6
+        num_workers: 4
 
 Model:
     name: TransMIL

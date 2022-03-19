@@ -34,7 +34,7 @@ def main(cfg):
     cfg.callbacks = load_callbacks(cfg)
     # cfg.callbacks = None
 
-    #---->Define Data 
+    #---->Define Data
     DataInterface_dict = {'train_batch_size': cfg.Data.train_dataloader.batch_size,
                 'train_num_workers': cfg.Data.train_dataloader.num_workers,
                 'test_batch_size': cfg.Data.test_dataloader.batch_size,
@@ -51,16 +51,16 @@ def main(cfg):
                             'log': cfg.log_path
                             }
     model = ModelInterface(**ModelInterface_dict)
-    
+
     #---->Instantiate Trainer
     trainer = Trainer(
-        num_sanity_val_steps=0, 
+        num_sanity_val_steps=0,
         logger=cfg.load_loggers,
         callbacks=cfg.callbacks,
         max_epochs= cfg.General.epochs,
         gpus=cfg.General.gpus,
-        amp_level=cfg.General.amp_level,  
-        precision=cfg.General.precision,  
+        amp_level=cfg.General.amp_level,
+        precision=cfg.General.precision,
         accumulate_grad_batches=cfg.General.grad_acc,
         deterministic=True,
         check_val_every_n_epoch=1,
@@ -71,7 +71,6 @@ def main(cfg):
         trainer.fit(model = model, datamodule = dm)
     else:
         model_paths = list(cfg.log_path.glob('*.ckpt'))
-        print("Here: ", model_paths)
         model_paths = [str(model_path) for model_path in model_paths if 'epoch' in str(model_path)]
         for path in model_paths:
             print(path)
@@ -91,4 +90,3 @@ if __name__ == '__main__':
 
     #---->main
     main(cfg)
- 
