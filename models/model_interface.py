@@ -205,6 +205,7 @@ class  ModelInterface(pl.LightningModule):
 
     def load_model(self):
         name = self.hparams.model.name
+        print("model loading:", name)
         # Change the `trans_unet.py` file name to `TransUnet` class name.
         # Please always name your model file name as `trans_unet.py` and
         # class name or funciton name corresponding `TransUnet`.
