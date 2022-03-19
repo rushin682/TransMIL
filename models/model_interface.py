@@ -37,30 +37,30 @@ class  ModelInterface(pl.LightningModule):
 
         #---->Metrics
         if self.n_classes > 2:
-            self.AUROC = torchmetrics.AUROC(num_classes = self.n_classes, average = 'macro')
+            self.AUROC = torchmetrics.AUROC(num_classes = self.n_classes, average = None) # class average
             metrics = torchmetrics.MetricCollection([torchmetrics.Accuracy(num_classes = self.n_classes,
-                                                                           average='micro'),
+                                                                           average=None), # all average
                                                      torchmetrics.CohenKappa(num_classes = self.n_classes),
                                                      torchmetrics.F1(num_classes = self.n_classes,
-                                                                     average = 'macro'),
-                                                     torchmetrics.Recall(average = 'macro',
+                                                                     average = None), # class average
+                                                     torchmetrics.Recall(average = None, # class average
                                                                          num_classes = self.n_classes),
-                                                     torchmetrics.Precision(average = 'macro',
+                                                     torchmetrics.Precision(average = None, # class average
                                                                             num_classes = self.n_classes),
-                                                     torchmetrics.Specificity(average = 'macro',
+                                                     torchmetrics.Specificity(average = None, # class average
                                                                             num_classes = self.n_classes)])
         else :
-            self.AUROC = torchmetrics.AUROC(num_classes=2, average = 'macro')
+            self.AUROC = torchmetrics.AUROC(num_classes=2, average = None) # class average
             metrics = torchmetrics.MetricCollection([torchmetrics.Accuracy(num_classes = 2,
-                                                                           average = 'micro'),
+                                                                           average = None), # all average
                                                      torchmetrics.CohenKappa(num_classes = 2),
                                                      torchmetrics.F1(num_classes = 2,
-                                                                     average = 'macro'),
-                                                     torchmetrics.Recall(average = 'macro',
+                                                                     average = None), # class average
+                                                     torchmetrics.Recall(average = None, # class average
                                                                          num_classes = 2),
-                                                     torchmetrics.Precision(average = 'macro',
+                                                     torchmetrics.Precision(average = None, # class average
                                                                             num_classes = 2),
-                                                     torchmetrics.Specificity(average = 'macro',
+                                                     torchmetrics.Specificity(average = None, # class average
                                                                             num_classes = 2)])
         self.valid_metrics = metrics.clone(prefix = 'val_')
         self.test_metrics = metrics.clone(prefix = 'test_')
@@ -131,11 +131,11 @@ class  ModelInterface(pl.LightningModule):
 
         #---->
         self.log('val_loss', cross_entropy_torch(logits, target), prog_bar=True, on_epoch=True, logger=True)
-        self.log('auc', self.AUROC(probs, target.squeeze()), prog_bar=True, on_epoch=True, logger=True)
-        self.log_dict(self.valid_metrics(max_probs.squeeze() , target.squeeze()),
-                          on_epoch = True, logger = True)
+        self.log('auc', self.AUROC(probs, target.squeeze()).mean(), prog_bar=True, on_epoch=True, logger=True)
 
         #---->acc log
+        micro_count = 0
+        micro_correct = 0
         for c in range(self.n_classes):
             count = self.data[c]["count"]
             correct = self.data[c]["correct"]
@@ -144,6 +144,19 @@ class  ModelInterface(pl.LightningModule):
             else:
                 acc = float(correct) / count
             print('class {}: acc {}, correct {}/{}'.format(c, acc, correct, count))
+
+            micro_count += count
+            micro_correct += correct
+
+        vm = self.valid_metrics(max_probs.squeeze() , target.squeeze())
+        vm['val_Accuracy'] = micro_count / micro_correct
+        vm['val_CohenKappa'] = vm['val_CohenKappa']
+        vm['val_F1'] = vm['val_F1'].mean()
+        vm['val_Recall'] = vm['val_Recall'].mean()
+        vm['val_Precision'] = vm['val_Precision'].mean()
+        vm['val_Specificity'] = vm['val_Specificity'].mean()
+
+        self.log_dict(vm, on_epoch = True, logger = True)
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
 
         #---->random, if shuffle data, change seed
@@ -176,15 +189,9 @@ class  ModelInterface(pl.LightningModule):
         max_probs = torch.stack([x['Y_hat'] for x in output_results])
         target = torch.stack([x['label'] for x in output_results], dim = 0)
 
-        #---->
-        auc = self.AUROC(probs, target.squeeze())
-        metrics = self.test_metrics(max_probs.squeeze() , target.squeeze())
-        metrics['auc'] = auc
-        for keys, values in metrics.items():
-            print(f'{keys} = {values}')
-            metrics[keys] = values.cpu().numpy()
-        print()
         #---->acc log
+        micro_count = 0
+        micro_correct = 0
         for c in range(self.n_classes):
             count = self.data[c]["count"]
             correct = self.data[c]["correct"]
@@ -193,11 +200,34 @@ class  ModelInterface(pl.LightningModule):
             else:
                 acc = float(correct) / count
             print('class {}: acc {}, correct {}/{}'.format(c, acc, correct, count))
-        self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
+
+            micro_count += count
+            micro_correct += correct
+
         #---->
-        print("In test_epoch_end", self.log_path)
+        auc = self.AUROC(probs, target.squeeze())
+        metrics = self.test_metrics(max_probs.squeeze() , target.squeeze())
+        metrics['test_auc'] = auc
+        for keys, values in metrics.items():
+            print(f'{keys} = {values}')
+            metrics[keys] = values.cpu().numpy()
+        print()
+        class_specific_results = pd.DataFrame([metrics])
+        class_specific_results.to_csv(self.log_path / 'class_specific_results.csv')
+
+        metrics['test_auc'] = auc.mean()
+        metrics['test_Accuracy'] = micro_count / micro_correct
+        metrics['test_CohenKappa'] = metrics['test_CohenKappa']
+        metrics['test_F1'] = metrics['test_F1'].mean()
+        metrics['test_Recall'] = metrics['test_Recall'].mean()
+        metrics['test_Precision'] = metrics['test_Precision'].mean()
+        metrics['test_Specificity'] = metrics['test_Specificity'].mean()
+
+        #---->
         result = pd.DataFrame([metrics])
         result.to_csv(self.log_path / 'result.csv')
+
+        self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
 
 
     def load_model(self):
