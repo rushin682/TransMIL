@@ -74,12 +74,9 @@ def main(cfg):
         model_paths = [str(model_path) for model_path in model_paths if 'epoch' in str(model_path)]
 
         for path in model_paths:
-            print(path)
-            new_model = model.load_from_checkpoint(checkpoint_path=path, cfg=cfg)
-    '''
-            print("In Train.py - after", cfg.log_path)
+            new_model = model.load_from_checkpoint(checkpoint_path=path, **ModelInterface_dict)
             trainer.test(model=new_model, datamodule=dm)
-    '''
+
 if __name__ == '__main__':
 
     args = make_parse()

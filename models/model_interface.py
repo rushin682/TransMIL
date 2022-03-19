@@ -31,7 +31,6 @@ class  ModelInterface(pl.LightningModule):
         self.optimizer = optimizer
         self.n_classes = model.n_classes
         self.log_path = kargs['log']
-        print(self.log_path)
 
         #---->acc
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
