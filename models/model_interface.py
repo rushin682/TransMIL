@@ -25,9 +25,7 @@ class  ModelInterface(pl.LightningModule):
     #---->init
     def __init__(self, model, loss, optimizer, **kargs):
         super(ModelInterface, self).__init__()
-        print("In ModelInterface before:", self.log_path)
         self.save_hyperparameters()
-        print("In ModelInterface after:", self.log_path)
         self.load_model()
         self.loss = create_loss(loss)
         self.optimizer = optimizer

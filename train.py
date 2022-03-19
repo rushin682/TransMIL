@@ -52,6 +52,7 @@ def main(cfg):
                             }
     model = ModelInterface(**ModelInterface_dict)
 
+    '''
     #---->Instantiate Trainer
     trainer = Trainer(
         num_sanity_val_steps=0,
@@ -77,6 +78,7 @@ def main(cfg):
             new_model = model.load_from_checkpoint(checkpoint_path=path, cfg=cfg)
             print("In Train.py - after", cfg.log_path)
             trainer.test(model=new_model, datamodule=dm)
+    '''
 
 if __name__ == '__main__':
 
