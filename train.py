@@ -50,7 +50,6 @@ def main(cfg):
                             'data': cfg.Data,
                             'log': cfg.log_path
                             }
-    print("In Train.py", cfg.log_path)
     model = ModelInterface(**ModelInterface_dict)
 
     #---->Instantiate Trainer
@@ -76,6 +75,7 @@ def main(cfg):
         for path in model_paths:
             print(path)
             new_model = model.load_from_checkpoint(checkpoint_path=path, cfg=cfg)
+            print("In Train.py - after", cfg.log_path)
             trainer.test(model=new_model, datamodule=dm)
 
 if __name__ == '__main__':
