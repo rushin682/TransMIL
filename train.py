@@ -50,6 +50,7 @@ def main(cfg):
                             'data': cfg.Data,
                             'log': cfg.log_path
                             }
+    print("In Train.py", cfg.log_path)
     model = ModelInterface(**ModelInterface_dict)
 
     #---->Instantiate Trainer

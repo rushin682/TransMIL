@@ -31,6 +31,7 @@ class  ModelInterface(pl.LightningModule):
         self.optimizer = optimizer
         self.n_classes = model.n_classes
         self.log_path = kargs['log']
+        print("In ModelInterface:", self.log_path)
 
         #---->acc
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
@@ -195,6 +196,7 @@ class  ModelInterface(pl.LightningModule):
             print('class {}: acc {}, correct {}/{}'.format(c, acc, correct, count))
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
         #---->
+        print("In test_epoch_end", self.log_path)
         result = pd.DataFrame([metrics])
         result.to_csv(self.log_path / 'result.csv')
 
