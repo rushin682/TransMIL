@@ -149,7 +149,7 @@ class  ModelInterface(pl.LightningModule):
             micro_correct += correct
 
         vm = self.valid_metrics(max_probs.squeeze() , target.squeeze())
-        vm['val_Accuracy'] = micro_count / micro_correct
+        vm['val_Accuracy'] = micro_correct / micro_count
         vm['val_CohenKappa'] = vm['val_CohenKappa']
         vm['val_F1'] = vm['val_F1'].mean()
         vm['val_Recall'] = vm['val_Recall'].mean()
@@ -216,7 +216,7 @@ class  ModelInterface(pl.LightningModule):
         class_specific_results.to_csv(self.log_path / 'class_specific_results.csv')
 
         metrics['test_auc'] = auc.mean()
-        metrics['test_Accuracy'] = micro_count / micro_correct
+        metrics['test_Accuracy'] = micro_correct / micro_count
         metrics['test_CohenKappa'] = metrics['test_CohenKappa']
         metrics['test_F1'] = metrics['test_F1'].mean()
         metrics['test_Recall'] = metrics['test_Recall'].mean()
