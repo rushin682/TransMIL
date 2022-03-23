@@ -48,6 +48,8 @@ class  ModelInterface(pl.LightningModule):
                                                      torchmetrics.Precision(average = None, # class average
                                                                             num_classes = self.n_classes),
                                                      torchmetrics.Specificity(average = None, # class average
+                                                                            num_classes = self.n_classes),
+                                                     torchmetrics.ConfusionMatrix(normalize=None,
                                                                             num_classes = self.n_classes)])
         else :
             self.AUROC = torchmetrics.AUROC(num_classes=2, average = None) # class average
@@ -61,6 +63,8 @@ class  ModelInterface(pl.LightningModule):
                                                      torchmetrics.Precision(average = None, # class average
                                                                             num_classes = 2),
                                                      torchmetrics.Specificity(average = None, # class average
+                                                                            num_classes = 2),
+                                                     torchmetrics.ConfusionMatrix(normalize=None,
                                                                             num_classes = 2)])
         self.valid_metrics = metrics.clone(prefix = 'val_')
         self.test_metrics = metrics.clone(prefix = 'test_')
@@ -156,6 +160,8 @@ class  ModelInterface(pl.LightningModule):
         vm['val_Precision'] = vm['val_Precision'].mean()
         vm['val_Specificity'] = vm['val_Specificity'].mean()
 
+        print (vm['val_ConfusionMatrix'])
+
         self.log_dict(vm, on_epoch = True, logger = True)
         self.data = [{"count": 0, "correct": 0} for i in range(self.n_classes)]
 
@@ -222,6 +228,8 @@ class  ModelInterface(pl.LightningModule):
         metrics['test_Recall'] = metrics['test_Recall'].mean()
         metrics['test_Precision'] = metrics['test_Precision'].mean()
         metrics['test_Specificity'] = metrics['test_Specificity'].mean()
+
+        print (vm['test_ConfusionMatrix'])
 
         #---->
         result = pd.DataFrame([metrics])
