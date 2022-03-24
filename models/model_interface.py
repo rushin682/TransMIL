@@ -228,8 +228,11 @@ class  ModelInterface(pl.LightningModule):
         metrics['test_Recall'] = metrics['test_Recall'].mean()
         metrics['test_Precision'] = metrics['test_Precision'].mean()
         metrics['test_Specificity'] = metrics['test_Specificity'].mean()
+        cm  = metrics['test_ConfusionMatrix']
+        metrics['test_ConfusionMatrix'] = torch.tensor(cm[0,0], cm[0,1]+cm[0,2]],
+                                           [cm[1,0]+cm[2,0], cm[1,1]+cm[1,2]+cm[2,1]+cm[2,2]]])
 
-        print (vm['test_ConfusionMatrix'])
+        print (metrics['test_ConfusionMatrix'])
 
         #---->
         result = pd.DataFrame([metrics])
