@@ -195,6 +195,9 @@ class  ModelInterface(pl.LightningModule):
         max_probs = torch.stack([x['Y_hat'] for x in output_results])
         target = torch.stack([x['label'] for x in output_results], dim = 0)
 
+        scores = pd.DataFrame({'Y_scores': probs, 'ArgMax': max_probs, 'Y_true': target})
+        scores.to_csv(self.log_path / 'all_scores.csv')
+
         #---->acc log
         micro_count = 0
         micro_correct = 0
